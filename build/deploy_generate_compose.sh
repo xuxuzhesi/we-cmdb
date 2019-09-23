@@ -21,4 +21,5 @@ sed -i "s~{{MYSQL_INIT_PASSWORD}}~$mysql_init_password~g" docker-compose.yml
 sed -i "s~{{CMDB_DATABASE_SERVER}}~$cmdb_database_server~g" docker-compose.yml
 sed -i "s~{{CMDB_DATABASE_PORT}}~$cmdb_database_port~g" docker-compose.yml
 sed -i "s~{{IMAGE_VERSION}}~$image_version~g" docker-compose.yml
+sed -i "s~{{CMDB_START_ARGUMENT}}~$cmdb_start_argument~g" docker-compose.yml
  
