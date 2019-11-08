@@ -1,4 +1,51 @@
 SET FOREIGN_KEY_CHECKS=0;
+
+INSERT INTO `adm_user` (`id_adm_user`, `name`, `code`, `encrypted_password`, `description`, `id_adm_tenement`, `action_flag`, `is_system`) VALUES
+	(2, 'Jordan Zhang', 'jordan', '$2a$10$N7CQen.5UtFbEIPBYWhfgOnAg73h0YbLQjr2ivVuEeDATghfuZea.', 'CMDB Admin', NULL, NULL, NULL),
+	(3, 'Monkey', 'monkey', '$2a$10$N7CQen.5UtFbEIPBYWhfgOnAg73h0YbLQjr2ivVuEeDATghfuZea.', 'CMDB Developer', NULL, NULL, NULL),
+	(4, 'Chaney Liu', 'chaneyliu', '$2a$10$N7CQen.5UtFbEIPBYWhfgOnAg73h0YbLQjr2ivVuEeDATghfuZea.', 'CMDB Architect', NULL, NULL, NULL);
+
+INSERT INTO `adm_role_user` (`id_adm_role_user`, `id_adm_role`, `id_adm_user`, `is_system`) VALUES
+	(2, 2, 2, 0),
+	(3, 9, 3, 0),
+	(4, 6, 4, 0);
+
+INSERT INTO `adm_role_menu` (`id_adm_role_menu`, `id_adm_role`, `id_adm_menu`, `is_system`) VALUES
+	(25, 2, 20, 0),
+	(26, 2, 21, 0),
+	(27, 2, 22, 0),
+	(28, 2, 23, 0),
+	(29, 2, 24, 0),
+	(30, 2, 9, 0),
+	(31, 2, 10, 0),
+	(32, 2, 11, 0),
+	(33, 2, 16, 0),
+	(34, 2, 17, 0),
+	(35, 2, 18, 0),
+	(36, 2, 19, 0),
+	(37, 2, 6, 0),
+	(38, 2, 7, 0),
+	(39, 2, 8, 0),
+	(44, 9, 6, 0),
+	(45, 9, 7, 0),
+	(46, 9, 8, 0),
+	(47, 9, 9, 0),
+	(48, 9, 10, 0),
+	(49, 9, 11, 0),
+	(50, 6, 16, 0),
+	(51, 6, 17, 0),
+	(52, 6, 18, 0),
+	(53, 6, 19, 0),
+	(54, 6, 6, 0),
+	(55, 6, 7, 0),
+	(56, 6, 8, 0),
+	(57, 6, 9, 0),
+	(58, 6, 10, 0),
+	(59, 6, 11, 0),
+	(61, 6, 22, 0),
+	(62, 6, 20, 0),
+	(63, 6, 23, 0);
+
 INSERT INTO `adm_sequence` (`id_adm_sequence`, `seq_name`, `current_val`, `increment_val`, `length_limitation`, `left_zero_padding`) VALUES
 	(25, 'system_design', 14, 1, 8, 'N'),
 	(26, 'subsys_design', 15, 1, 8, 'N'),
@@ -48,13 +95,13 @@ INSERT INTO `DCN_desgin` (`guid`, `p_guid`, `r_guid`, `updated_by`, `updated_dat
 	('0025_0000000008', NULL, '0025_0000000008', 'admin', '2019-07-24 11:50:22', 'admin', '2019-07-24 11:50:21', 'PRD-INTRANET-WEB', 34, '', 'WEB', '桌面WEB', NULL, NULL, 105, 126, '0023_0000000006');
 
 INSERT INTO `host` (`guid`, `p_guid`, `r_guid`, `updated_by`, `updated_date`, `created_by`, `created_date`, `key_name`, `state`, `fixed_date`, `code`, `description`, `orchestration`, `biz_key`, `asset_code`, `charge_type`, `disk`, `instance_num`, `internet_nat_ip`, `intranet_ip`, `name`, `os`, `resource_set`, `type`) VALUES
-	('0012_0000000002', NULL, '0012_0000000002', 'admin', '2019-07-25 13:07:00', 'admin', '2019-07-25 12:39:07', 'HOST-07_10.0.16.2', 40, '2019-07-25 21:07:00', 'HOST-07', 'HOST-07', NULL, 'rxeYnnIy2Bv', 'ins-rudnbj7m', 115, 167, 3, '', '0014_0000000002', 'HOST-07', 164, '0020_0000000003', 163),
-	('0012_0000000003', NULL, '0012_0000000003', 'admin', '2019-07-25 13:47:00', 'admin', '2019-07-25 13:44:53', 'HOST08_10.0.21.2', 40, '2019-07-25 21:47:00', 'HOST-08', 'HOST-08', NULL, 'rxf8rvAJ2Bi', 'ins-eh5hzypa', 115, 167, 3, '', '0014_0000000021', 'HOST08', 164, '0020_0000000013', 163);
+	('0012_0000000002', NULL, '0012_0000000002', 'admin', '2019-07-25 13:07:00', 'admin', '2019-07-25 12:39:07', 'HOST-07_10.0.16.2', 40, '2019-07-25 21:07:00', 'HOST-07', 'HOST-07', NULL, 'rxeYnnIy2Bv', 'ins-rudnbj7m', 115, 167, 3, '', '0014_0000000002', 'HOST-07', 164, '0020_0000000009', 163),
+	('0012_0000000003', NULL, '0012_0000000003', 'admin', '2019-07-25 13:47:00', 'admin', '2019-07-25 13:44:53', 'HOST08_10.0.21.2', 40, '2019-07-25 21:47:00', 'HOST-08', 'HOST-08', NULL, 'rxf8rvAJ2Bi', 'ins-eh5hzypa', 115, 167, 3, '', '0014_0000000021', 'HOST08', 164, '0020_0000000009', 163);
 
 INSERT INTO `IDC` (`guid`, `p_guid`, `r_guid`, `updated_by`, `updated_date`, `created_by`, `created_date`, `key_name`, `state`, `fixed_date`, `code`, `description`, `orchestration`, `biz_key`, `address`, `city`, `env_type`, `idc_design`, `name`, `parameter`, `network_segment`) VALUES
-	('0016_0000000001', NULL, '0016_0000000001', 'admin', '2019-07-24 14:19:54', 'admin', '2019-07-24 06:57:33', 'PRD-GZ1', 38, NULL, 'GZ1', '生产广州云机房1', NULL, NULL, '', '广州', 109, '0022_0000000001', '生产广州云机房1', 'Region=ap-guangzhou;AvailableZone=ap-guangzhou-3;SecretID=SecretID;SecretKey=SecretKey', '0021_0000000001'),
-	('0016_0000000002', NULL, '0016_0000000002', 'admin', '2019-07-24 12:11:01', 'admin', '2019-07-24 06:57:58', 'PRD-GZ2', 38, NULL, 'GZ2', '生产广州云机房2', NULL, NULL, '', '广州', NULL, '0022_0000000001', '生产广州云机房2', 'Region=ap-guangzhou;AvailableZone=ap-guangzhou-3;SecretID=SecretID;SecretKey=SecretKey', NULL),
-	('0016_0000000003', NULL, '0016_0000000003', 'admin', '2019-07-24 12:11:01', 'admin', '2019-07-24 06:58:50', 'STG-SH1', 38, NULL, 'SH1', '测试上海云机房1', NULL, NULL, '', '上海', NULL, '0022_0000000002', '测试上海云机房1', 'Region=ap-shanghai;AvailableZone=ap-shanghai-2;SecretID=SecretID;SecretKey=SecretKey', NULL),
+	('0016_0000000001', '0016_0000000004', '0016_0000000001', 'admin', '2019-07-24 14:19:54', 'admin', '2019-07-24 06:57:33', 'PRD-GZ1', 38, NULL, 'GZ1', '生产广州云机房1', NULL, NULL, '', '广州', 109, '0022_0000000001', '生产广州云机房1', 'Region=ap-guangzhou;AvailableZone=ap-guangzhou-3;SecretID=SecretID;SecretKey=SecretKey', '0021_0000000001'),
+	('0016_0000000002', '0016_0000000005', '0016_0000000002', 'admin', '2019-07-24 12:11:01', 'admin', '2019-07-24 06:57:58', 'PRD-GZ2', 38, NULL, 'GZ2', '生产广州云机房2', NULL, NULL, '', '广州', NULL, '0022_0000000001', '生产广州云机房2', 'Region=ap-guangzhou;AvailableZone=ap-guangzhou-3;SecretID=SecretID;SecretKey=SecretKey', NULL),
+	('0016_0000000003', '0016_0000000006', '0016_0000000003', 'admin', '2019-07-24 12:11:01', 'admin', '2019-07-24 06:58:50', 'STG-SH1', 38, NULL, 'SH1', '测试上海云机房1', NULL, NULL, '', '上海', NULL, '0022_0000000002', '测试上海云机房1', 'Region=ap-shanghai;AvailableZone=ap-shanghai-2;SecretID=SecretID;SecretKey=SecretKey', NULL),
 	('0016_0000000004', NULL, '0016_0000000001', 'admin', '2019-07-24 07:32:57', 'admin', '2019-07-24 06:57:33', 'PRD-0016_0000000001', 37, '2019-07-24 15:32:57', '0016_0000000001', '生产广州云机房1', NULL, NULL, '', '广州', NULL, '0022_0000000001', '生产广州云机房1', 'Region=ap-guangzhou;AvailableZone=ap-guangzhou-3;SecretID=SecretID;SecretKey=SecretKey', NULL),
 	('0016_0000000005', NULL, '0016_0000000002', 'admin', '2019-07-24 07:32:58', 'admin', '2019-07-24 06:57:58', 'PRD-0016_0000000002', 37, '2019-07-24 15:32:58', '0016_0000000002', '生产广州云机房2', NULL, NULL, '', '广州', NULL, '0022_0000000001', '生产广州云机房2', 'Region=ap-guangzhou;AvailableZone=ap-guangzhou-3;SecretID=SecretID;SecretKey=SecretKey', NULL),
 	('0016_0000000006', NULL, '0016_0000000003', 'admin', '2019-07-24 07:32:59', 'admin', '2019-07-24 06:58:50', 'STG-0016_0000000003', 37, '2019-07-24 15:32:59', '0016_0000000003', '测试上海云机房1', NULL, NULL, '', '上海', NULL, '0022_0000000002', '测试上海云机房1', 'Region=ap-shanghai;AvailableZone=ap-shanghai-2;SecretID=SecretID;SecretKey=SecretKey', NULL);
@@ -79,6 +126,12 @@ INSERT INTO `invoke_design` (`guid`, `p_guid`, `r_guid`, `updated_by`, `updated_
 
 INSERT INTO `invoke_sequence_design` (`guid`, `p_guid`, `r_guid`, `updated_by`, `updated_date`, `created_by`, `created_date`, `key_name`, `state`, `fixed_date`, `code`, `description`, `orchestration`, `biz_key`, `name`, `service_design`) VALUES
 	('0006_0000000001', NULL, '0006_0000000001', 'admin', '2019-07-29 03:38:01', 'admin', '2019-07-24 15:13:03', 'EDP-CONSOLE-APP-SER1-MANAGE', 34, '', 'MANAGE', '管理', 223, 'rxA3j9uJ2BD', '管理', '0004_0000000004');
+
+INSERT INTO `invoke_sequence_design$invoke_design_sequence` (`id`, `from_guid`, `to_guid`, `seq_no`) VALUES
+    ('1','0006_0000000001','0005_0000000009',1),
+    ('2','0006_0000000001','0005_0000000007',3),
+    ('3','0006_0000000001','0005_0000000008',2),
+    ('4','0006_0000000001','0005_0000000006',4);
 
 INSERT INTO `ip_addr` (`guid`, `p_guid`, `r_guid`, `updated_by`, `updated_date`, `created_by`, `created_date`, `key_name`, `state`, `fixed_date`, `code`, `description`, `orchestration`, `biz_key`, `network_segment`, `type`, `used_record`) VALUES
 	('0014_0000000001', NULL, '0014_0000000001', 'admin', '2019-07-24 11:41:45', 'admin', '2019-07-24 11:40:31', '10.0.16.1/24', 37, '', '10.0.16.1', 'DMZ proxy 网关', NULL, NULL, '0021_0000000006', 172, '0014_0000000001_0014_0000000001_0014_0000000001_10.0.16.0/24_VPC子网网段'),

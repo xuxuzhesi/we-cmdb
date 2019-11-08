@@ -1,10 +1,10 @@
 <template>
   <Header>
+    <span class="header-title">{{ $t("header_title") }}</span>
     <div class="menus">
       <Menu mode="horizontal" theme="dark">
         <Submenu v-for="menu in menus" :name="menu.code" :key="menu.code">
           <template slot="title">
-            <!-- <Icon size="large" :type="menu.icon" /> -->
             {{ menu.title }}
           </template>
           <router-link
@@ -25,13 +25,15 @@
           <span style="color: white">{{ user }}</span>
           <Icon :size="18" type="md-arrow-dropdown"></Icon>
           <DropdownMenu slot="list">
-            <DropdownItem name="logout" to="/cmdb/logout">
-              <a href="/cmdb/logout" style="width: 100%; display: block">{{
+            <DropdownItem name="logout" to="/wecmdb/logout">
+              <a href="/wecmdb/logout" style="width: 100%; display: block">{{
                 $t("logout")
               }}</a>
             </DropdownItem>
             <DropdownItem name="changePassword">
-              <router-link to="/setting/change-password">修改密码</router-link>
+              <router-link to="/setting/change-password">{{
+                $t("password_edit")
+              }}</router-link>
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -51,7 +53,6 @@
             <DropdownItem
               v-for="(item, key) in language"
               :key="item.id"
-              :disabled="item === 'English'"
               @click.native="changeLanguage(key)"
               >{{ item }}</DropdownItem
             >
@@ -81,13 +82,16 @@ export default {
   },
   methods: {
     changeLanguage(key) {
-      if (key === "en-US") return;
       Vue.config.lang = key;
       this.currentLanguage = this.language[key];
       localStorage.setItem("lang", key);
     },
     getLocalLang() {
-      let currentLangKey = localStorage.getItem("lang") || navigator.language;
+      let currentLangKey =
+        localStorage.getItem("lang") ||
+        navigator.language ||
+        navigator.userLanguage;
+      currentLangKey = currentLangKey === "zh-CN" ? currentLangKey : "en-US";
       this.currentLanguage = this.language[currentLangKey];
     },
     async getMyMenus() {
@@ -148,10 +152,20 @@ export default {
 <style lang="scss" scoped>
 .header {
   display: flex;
+  justify-content: center;
+
+  .header-title {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+    float: left;
+    margin-right: 10px;
+  }
 
   .ivu-layout-header {
     height: 50px;
     line-height: 50px;
+    padding: 0 17px;
   }
   a {
     color: white;

@@ -2,7 +2,7 @@
   <div>
     <Row class="artifact-management">
       <Col span="6">
-        <span style="margin-right: 10px">系统设计</span>
+        <span style="margin-right: 10px">{{ $t("system_design") }}</span>
         <Select
           filterable
           @on-change="onSystemDesignSelect"
@@ -19,7 +19,7 @@
         </Select>
       </Col>
       <Col span="6" offset="1">
-        <span style="margin-right: 10px">环境类型</span>
+        <span style="margin-right: 10px">{{ $t("environmental_type") }}</span>
         <Select
           @on-change="onEnvSelect"
           v-model="env"
@@ -32,7 +32,7 @@
         </Select>
       </Col>
       <Col span="3" offset="1">
-        <Button type="info" @click="querySysTree">查询</Button>
+        <Button type="info" @click="querySysTree">{{ $t("query") }}</Button>
       </Col>
     </Row>
     <hr style="margin: 10px 0" />
@@ -42,7 +42,11 @@
       :closable="false"
       @on-click="handleTabClick"
     >
-      <TabPane label="应用逻辑图" name="logic-graph" :index="1">
+      <TabPane
+        :label="$t('application_logic_diagram')"
+        name="logic-graph"
+        :index="1"
+      >
         <Alert show-icon closable v-if="isDataChanged">
           Data has beed changed, click Reload button to reload graph.
           <Button slot="desc" @click="reloadHandler">Reload</Button>
@@ -51,11 +55,18 @@
         <div class="graph-container" id="graph">
           <Spin size="large" fix v-if="spinShow">
             <Icon type="ios-loading" size="44" class="spin-icon-load"></Icon>
-            <div>加载中...</div>
+            <div>{{ $t("loading") }}</div>
           </Spin>
+          <div v-else-if="!systemData.length" class="no-data">
+            {{ $t("no_data") }}
+          </div>
         </div>
       </TabPane>
-      <TabPane label="应用树状逻辑图" name="logic-tree-graph" :index="2">
+      <TabPane
+        :label="$t('application_logic_tree_diagram')"
+        name="logic-tree-graph"
+        :index="2"
+      >
         <Alert show-icon closable v-if="isDataChanged">
           Data has beed changed, click Reload button to reload graph.
           <Button slot="desc" @click="reloadHandler">Reload</Button>
@@ -64,11 +75,15 @@
         <div class="graph-container" id="graphTree">
           <Spin size="large" fix v-if="treeSpinShow">
             <Icon type="ios-loading" size="44" class="spin-icon-load"></Icon>
-            <div>加载中...</div>
+            <div>{{ $t("loading") }}</div>
           </Spin>
         </div>
       </TabPane>
-      <TabPane label="物理部署图" name="physicalGraph" :index="3">
+      <TabPane
+        :label="$t('physical_deployment_diagram')"
+        name="physicalGraph"
+        :index="3"
+      >
         <div id="physicalGraph">
           <PhysicalGraph
             v-if="physicalGraphData.length"
@@ -76,9 +91,10 @@
             :links="physicalGraphLinks"
             :callback="graphCallback"
           ></PhysicalGraph>
+          <div v-else class="no-data">{{ $t("no_data") }}</div>
           <Spin size="large" fix v-if="physicalSpin">
             <Icon type="ios-loading" size="44" class="spin-icon-load"></Icon>
-            <div>加载中...</div>
+            <div>{{ $t("loading") }}</div>
           </Spin>
         </div>
       </TabPane>
@@ -90,7 +106,7 @@
         v-if="isShowTabs"
         :index="index + 5"
       >
-        <WeTable
+        <WeCMDBTable
           :tableData="ci.tableData"
           :tableOuterActions="ci.outerActions"
           :tableInnerActions="ci.innerActions"
@@ -107,7 +123,7 @@
           @pageSizeChange="pageSizeChange"
           tableHeight="650"
           :ref="'table' + ci.id"
-        ></WeTable>
+        ></WeCMDBTable>
       </TabPane>
     </Tabs>
   </div>
@@ -154,21 +170,22 @@ const serviceTask = require("../images/serviceTask.png");
 import { getExtraInnerActions } from "../util/state-operations.js";
 import PhysicalGraph from "./physical-graph";
 const stateColorMap = new Map([
-  ["new", "green"],
-  ["created", "green"],
-  ["update", "dodgerblue"],
-  ["change", "dodgerblue"],
-  ["destroyed", "red"],
-  ["delete", "red"]
+  ["new", "#19be6b"],
+  ["created", "#19be6b"],
+  ["update", "#2d8cf0"],
+  ["change", "#2d8cf0"],
+  ["destroyed", "#ed4014"],
+  ["delete", "#ed4014"]
 ]);
 
 const colors = [
-  "#E1F5FE",
-  "#B3E5FC",
-  "#81D4FA",
-  "#4FC3F7",
-  "#29B6F6",
-  "#0091EA"
+  "#bbdefb",
+  "#90caf9",
+  "#64b5f6",
+  "#42a5f5",
+  "#2196f3",
+  "#1e88e5",
+  "#1976d2"
 ];
 
 export default {
@@ -226,7 +243,7 @@ export default {
     }
   },
   methods: {
-    initADGraph(filters = {}) {
+    initADGraph() {
       this.spinShow = true;
       const initEvent = () => {
         let graph = d3.select("#graph");
@@ -309,7 +326,7 @@ export default {
             }
             dots.push("subgraph cluster_" + unit.guid + "{");
             dots.push(
-              `label="${unitLabel}"; style=filled; color=${color};tooltip="${
+              `label="${unitLabel}"; style=filled; color="${color}";tooltip="${
                 unit.data.description
               }"`
             );
@@ -384,39 +401,20 @@ export default {
         }
 
         dots.push(
-          '"' +
-            invoke.data.unit.guid +
-            '"' +
-            "->" +
-            '"' +
-            invoke.data.service.guid +
-            '"' +
-            '[id="' +
-            invoke.guid +
-            '"' +
-            ',color="' +
-            color +
-            '"' +
-            "];"
+          `"${invoke.data.unit.guid}"->"${invoke.data.service.guid}"[id="${
+            invoke.guid
+          }",color="${color}"];`
         );
         if (!graphMap.has(invoke.data.unit.guid)) {
           dots.push(
-            '"' +
-              invoke.data.unit.guid +
-              '"' +
-              '[label="' +
-              invoke.data.unit.key_name +
-              '"];'
+            `"${invoke.data.unit.guid}"[label="${invoke.data.unit.key_name}"`
           );
         }
         if (!graphMap.has(invoke.data.service.guid)) {
           dots.push(
-            '"' +
-              invoke.data.service.guid +
-              '"' +
-              '[label="' +
-              invoke.data.service.key_name +
-              '"];'
+            `"${invoke.data.service.guid}"[label="${
+              invoke.data.service.key_name
+            }"];`
           );
         }
       });
@@ -470,12 +468,15 @@ export default {
       if (!this.systemDesignVersion || !this.env) {
         this.$Notice.warning({
           title: "Warning",
-          desc: "请先选择系统设计和环境类型"
+          desc: this.$t("please_select_system_design_and_environmental_type")
         });
         return;
       }
       this.spinShow = true;
       this.treeSpinShow = true;
+      if (this.currentTab) {
+        this.queryCiData();
+      }
       let { status, message, data } = await getAllCITypes();
       if (status === "OK") {
         data.forEach(ci => {
@@ -555,7 +556,7 @@ export default {
             title: _.data.key_name,
             id: _.guid,
             expand: true,
-            disableCheckbox: !_.data.orchestration,
+            disableCheckbox: !_.data.WeCMDBOrchestration,
             children: this.formatTree(_.children)
           };
         } else {
@@ -564,7 +565,7 @@ export default {
             title: _.data.key_name,
             id: _.guid,
             expand: true,
-            disableCheckbox: !_.data.orchestration
+            disableCheckbox: !_.data.WeCMDBOrchestration
           };
         }
       });
@@ -587,7 +588,7 @@ export default {
           return {
             ciDataId: _.guid,
             ciTypeId: _.ciTypeId,
-            processDefinitionKey: _.data.orchestration.codeId
+            processDefinitionKey: _.data.WeCMDBOrchestration.codeId
           };
         })
       };
@@ -598,7 +599,7 @@ export default {
       } = await startProcessInstancesWithCiDataInbatch(payload);
       if (status === "OK") {
         this.$Notice.success({
-          title: "开始执行",
+          title: this.$t("start_execution"),
           desc: message
         });
       }
@@ -608,7 +609,7 @@ export default {
         return {
           ciGuid: _.guid,
           ciTypeId: _.ciTypeId,
-          definitionKey: _.data.orchestration.codeId
+          definitionKey: _.data.WeCMDBOrchestration.codeId
         };
       });
       const { status, data, message } = await previewDeployGraph(payload);
@@ -769,9 +770,9 @@ export default {
       layerDot.push("node [shape=plaintext, fontsize=16];");
       data.forEach((element, index) => {
         if (index === data.length - 1) {
-          layerDot.push(`${element.value}`);
+          layerDot.push(`"title_${index}"`);
         } else {
-          layerDot.push(`${element.value} -> `);
+          layerDot.push(`"title_${index}" -> `);
         }
         this.rankNodes[index + 1] = [];
         this.rankNodes[index + 1].push(element.value);
@@ -803,8 +804,16 @@ export default {
     },
     genRankNodeDot() {
       let dot = [];
-      Object.keys(this.rankNodes).forEach(key => {
-        dot = dot.concat([`{rank=same;`, this.rankNodes[key].join(";"), `;}`]);
+      Object.keys(this.rankNodes).forEach((key, index) => {
+        dot.push("{rank=same;");
+        this.rankNodes[key].forEach((_, i) => {
+          if (i === 0) {
+            dot.push(`"title_${index}"[label="${this.rankNodes[key][0]}"];`);
+          } else {
+            dot.push(`${this.rankNodes[key][i]};`);
+          }
+        });
+        dot.push("}");
       });
       return dot;
     },
@@ -991,7 +1000,7 @@ export default {
     },
     deleteHandler(deleteData) {
       this.$Modal.confirm({
-        title: "确认删除？",
+        title: this.$t("delete_confirm"),
         "z-index": 1000000,
         onOk: async () => {
           const payload = {
@@ -1232,7 +1241,7 @@ export default {
       if (this.env === "" || this.systemDesignVersion === "") {
         this.$Notice.warning({
           title: "Warning",
-          desc: "请先选择系统设计和环境类型"
+          desc: this.$t("please_select_system_design_and_environmental_type")
         });
         return;
       }
@@ -1246,6 +1255,7 @@ export default {
         }
       });
       let found = this.tabList.find(i => i.code === this.currentTab);
+      if (!found) return;
       let requst = {
         codeId: found.codeId,
         envCode: this.env,
@@ -1313,5 +1323,8 @@ export default {
 #graphTree {
   position: relative;
   min-height: calc(50% + 300px);
+}
+.no-data {
+  text-align: center;
 }
 </style>

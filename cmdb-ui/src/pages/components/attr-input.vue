@@ -8,7 +8,9 @@
           @input="inputHandler"
           :value="inputVal"
         ></textarea>
-        <span class="wecube-error-message">请选择非引用属性</span>
+        <span class="wecube-error-message">{{
+          $t("please_select_without_refrence")
+        }}</span>
       </div>
       <div slot="content">
         <div v-if="rootCiType" class="attr-ul">
@@ -106,6 +108,11 @@ export default {
     sourceData: {
       type: String,
       required: false
+    },
+    isEndWithCIType: {
+      type: Boolean,
+      default: false,
+      required: false
     }
   },
   watch: {
@@ -145,7 +152,8 @@ export default {
           this.ciTypeAttributeObj[attrId].inputType === "ref" ||
           this.ciTypeAttributeObj[attrId].inputType === "multiRef"
         ) {
-          this.$refs["wecube_cmdb_attr"].classList.add("wecube-error");
+          !this.isEndWithCIType &&
+            this.$refs["wecube_cmdb_attr"].classList.add("wecube-error");
         } else {
           this.$refs["wecube_cmdb_attr"].classList.remove("wecube-error");
         }
@@ -211,7 +219,11 @@ export default {
                 });
               }
             });
-            this.options = attr;
+            this.options = this.isEndWithCIType
+              ? attr.filter(
+                  _ => _.inputType === "ref" || _.inputType === "multiRef"
+                )
+              : attr;
           } else {
             this.$Message.error({
               content: message
@@ -243,7 +255,7 @@ export default {
     },
     formatAllCiType() {
       this.allCiTypes.forEach(_ => {
-        this.allCi = this.allCi.concat([..._.ciTypes]);
+        this.allCi = this.allCi.concat(_.ciTypes ? [..._.ciTypes] : []);
       });
     },
     inputHandler(v) {
@@ -271,7 +283,7 @@ export default {
       }
       if (!(v.data === "." || v.data === "-")) {
         this.$Message.error({
-          content: "请输入正确的操作符 . 或 -"
+          content: this.$t("please_input_legitimate_character")
         });
         this.$refs.textarea.value = this.inputVal;
       } else {
@@ -300,6 +312,7 @@ export default {
         ciTypeName: this.allCi.find(i => i.ciTypeId === item.id).name
       });
       this.options = [];
+      this.$refs["textarea"].focus();
       this.$emit("input", this.getValue(this.routine));
       this.$emit("change", this.getValue(this.routine));
     },

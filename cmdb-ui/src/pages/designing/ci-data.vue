@@ -7,8 +7,10 @@
       @on-tab-remove="handleTabRemove"
       @on-click="handleTabClick"
     >
-      <TabPane :closable="false" name="CMDB" label="CMDB模型">
-        <div class="graph-container" id="graph"></div>
+      <TabPane :closable="false" name="CMDB" :label="$t('cmdb_model')">
+        <card>
+          <div class="graph-container" id="graph"></div>
+        </card>
       </TabPane>
       <TabPane
         v-for="ci in tabList"
@@ -16,7 +18,7 @@
         :name="ci.id"
         :label="ci.name"
       >
-        <WeTable
+        <WeCMDBTable
           :tableData="ci.tableData"
           :tableOuterActions="ci.outerActions"
           :tableInnerActions="ci.innerActions"
@@ -33,7 +35,7 @@
           @pageSizeChange="pageSizeChange"
           tableHeight="650"
           :ref="'table' + ci.id"
-        ></WeTable>
+        ></WeCMDBTable>
       </TabPane>
     </Tabs>
   </div>
@@ -122,8 +124,8 @@ export default {
           .graphviz()
           .zoom(true)
           .scale(1.2)
-          .width(window.innerWidth * 0.96)
-          .height(window.innerHeight * 0.8)
+          .width(window.innerWidth - 92)
+          .height(window.innerHeight - 190)
           .attributer(function(d) {
             if (d.attributes.class === "edge") {
               var keys = d.key.split("->");
@@ -160,11 +162,11 @@ export default {
                 let imgFileSource =
                   i.imageFileId === 0 || i.imageFileId === undefined
                     ? defaultCiTypePNG.substring(0, defaultCiTypePNG.length - 4)
-                    : `/cmdb/ui/v2/files/${i.imageFileId}`;
+                    : `/wecmdb/ui/v2/files/${i.imageFileId}`;
                 this.$set(i, "form", {
                   ...i,
                   imgSource: imgFileSource,
-                  imgUploadURL: `/cmdb/ui/v2/ci-types/${i.ciTypeId}/icon`
+                  imgUploadURL: `/wecmdb/ui/v2/ci-types/${i.ciTypeId}/icon`
                 });
                 i.attributes &&
                   i.attributes.forEach(j => {
@@ -258,9 +260,9 @@ export default {
         '"->' +
         '"' +
         target.name.trim() +
-        '"[label="' +
+        '"[taillabel="' +
         labels +
-        '"];'
+        '", labeldistance=3];'
       );
     },
 
@@ -473,7 +475,7 @@ export default {
       );
       if (status === "OK") {
         this.$Notice.success({
-          title: type,
+          title: "Success",
           desc: message
         });
         this.queryCiData();
@@ -523,7 +525,7 @@ export default {
     },
     deleteHandler(deleteData) {
       this.$Modal.confirm({
-        title: "确认删除？",
+        title: this.$t("delete_confirm"),
         "z-index": 1000000,
         onOk: async () => {
           const payload = {
@@ -533,7 +535,7 @@ export default {
           const { status, message, data } = await deleteCiDatas(payload);
           if (status === "OK") {
             this.$Notice.success({
-              title: "Delete data Success",
+              title: "Deleted successfully",
               desc: message
             });
             this.tabList.forEach(ci => {
@@ -622,7 +624,7 @@ export default {
         const { status, message, data } = await createCiDatas(payload);
         if (status === "OK") {
           this.$Notice.success({
-            title: "Add data Success",
+            title: "Added successfully",
             desc: message
           });
           setBtnsStatus();
@@ -644,7 +646,7 @@ export default {
         const { status, message, data } = await updateCiDatas(payload);
         if (status === "OK") {
           this.$Notice.success({
-            title: "Update data Success",
+            title: "Updated successfully",
             desc: message
           });
           setBtnsStatus();

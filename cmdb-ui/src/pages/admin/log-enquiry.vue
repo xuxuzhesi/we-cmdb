@@ -1,16 +1,17 @@
 <template>
-  <WeTable
+  <WeCMDBTable
     :tableData="tableData"
     :tableColumns="columns"
-    :tableOuterActions="null"
+    :tableOuterActions="outerActions"
     :tableInnerActions="null"
     :showCheckbox="false"
     :pagination="pageInfo"
+    @sortHandler="sortHandler"
     @pageChange="pageChange"
     @pageSizeChange="pageSizeChange"
     @handleSubmit="handleSubmit"
     ref="table"
-  ></WeTable>
+  ></WeCMDBTable>
 </template>
 
 <script>
@@ -26,7 +27,20 @@ export default {
         currentPage: 1,
         total: 0
       },
-      filters: []
+      filters: [],
+      sorting: null,
+      outerActions: [
+        {
+          label: this.$t("column_filter"),
+          props: {
+            type: "primary",
+            icon: "ios-funnel",
+            shape: "circle",
+            disabled: false
+          },
+          actionType: "filterColumns"
+        }
+      ]
     };
   },
   methods: {
@@ -58,10 +72,7 @@ export default {
     },
     async fetchTableData() {
       const { data, statusCode } = await queryLog({
-        sorting: {
-          asc: false,
-          field: "createdDate"
-        },
+        sorting: this.sorting,
         paging: true,
         pageable: {
           pageSize: this.pageInfo.pageSize,
@@ -81,6 +92,17 @@ export default {
     pageSizeChange(size) {
       this.pageInfo.pageSize = size;
       this.$refs.table.handleSubmit();
+    },
+    sortHandler(data) {
+      if (data.order === "normal") {
+        delete this.sorting;
+      } else {
+        this.sorting = {
+          asc: data.order === "asc",
+          field: data.key
+        };
+      }
+      this.fetchTableData();
     },
     handleSubmit(v) {
       this.filters = v;

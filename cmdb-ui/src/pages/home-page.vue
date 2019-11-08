@@ -1,5 +1,7 @@
 <template>
-  <div id="graph" class="home-page"></div>
+  <card style="height: calc(100vh - 60px);">
+    <div id="graph" class="home-page"></div>
+  </card>
 </template>
 
 <script>
@@ -36,8 +38,8 @@ export default {
           .graphviz()
           .zoom(true)
           .scale(1.2)
-          .width(window.innerWidth * 0.9)
-          .height(window.innerHeight * 0.9)
+          .width(window.innerWidth - 92)
+          .height(window.innerHeight - 92)
           .attributer(function(d) {
             if (d.attributes.class === "edge") {
               let keys = d.key.split("->");
@@ -76,11 +78,11 @@ export default {
                 let imgFileSource =
                   i.imageFileId === 0 || i.imageFileId === undefined
                     ? defaultCiTypePNG.substring(0, defaultCiTypePNG.length - 4)
-                    : `/cmdb/ui/v2/files/${i.imageFileId}`;
+                    : `/wecmdb/ui/v2/files/${i.imageFileId}`;
                 this.$set(i, "form", {
                   ...i,
                   imgSource: imgFileSource,
-                  imgUploadURL: `/cmdb/ui/v2/ci-types/${i.ciTypeId}/icon`
+                  imgUploadURL: `/wecmdb/ui/v2/ci-types/${i.ciTypeId}/icon`
                 });
                 i.attributes &&
                   i.attributes.forEach(j => {
@@ -297,10 +299,11 @@ export default {
 <style lang="scss" scoped>
 .home-page {
   align-items: center;
+  background-color: #fff;
   display: flex;
   font-size: 75px;
   font-weight: 600;
-  height: calc(100vh - 60px);
+  height: 100%;
   justify-content: center;
 }
 </style>

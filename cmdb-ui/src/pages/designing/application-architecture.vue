@@ -3,7 +3,7 @@
     <Row>
       <Col span="12">
         <Row>
-          <span style="margin-right: 10px">系统设计</span>
+          <span style="margin-right: 10px">{{ $t("system_design") }}</span>
           <Select
             filterable
             @on-change="onSystemDesignSelect"
@@ -17,17 +17,23 @@
               >{{ item.name }}</Option
             >
           </Select>
-          <Button style="margin: 0 10px;" @click="onArchChange"
-            >架构变更</Button
+          <Button style="margin: 0 10px;" @click="onArchChange">{{
+            $t("architecture_change")
+          }}</Button>
+          <Button @click="querySysTree">{{ $t("fix_version") }}</Button>
+          <Modal
+            v-model="fixVersionTreeModal"
+            width="500px"
+            :title="$t('fix_version')"
           >
-          <Button @click="querySysTree">去定版</Button>
-          <Modal v-model="fixVersionTreeModal" width="500px" title="去定版">
             <div style="max-height: 600px; overflow: auto;">
               <Tree :data="deployTree"></Tree>
             </div>
             <div slot="footer">
-              <Button @click="cancelFixVersion">取消定版</Button>
-              <Button type="info" @click="onArchFixVersion">确定定版</Button>
+              <Button @click="cancelFixVersion">{{ $t("cancel") }}</Button>
+              <Button type="info" @click="onArchFixVersion">{{
+                $t("confirm")
+              }}</Button>
             </div>
           </Modal>
         </Row>
@@ -41,15 +47,21 @@
           :closable="false"
           @on-click="handleTabClick"
         >
-          <TabPane label="应用逻辑图" name="architecture-design">
+          <TabPane
+            :label="$t('application_logic_diagram')"
+            name="architecture-design"
+          >
             <Alert show-icon closable v-if="isDataChanged">
               Data has beed changed, click Reload button to reload graph.
               <Button slot="desc" @click="reloadHandler">Reload</Button>
             </Alert>
             <Spin size="large" fix v-if="spinShow">
               <Icon type="ios-loading" size="44" class="spin-icon-load"></Icon>
-              <div>加载中...</div>
+              <div>{{ $t("loading") }}</div>
             </Spin>
+            <div v-else-if="!systemDesignData.length" class="no-data">
+              {{ $t("no_data") }}
+            </div>
             <Row>
               <Col span="18">
                 <div style="padding-right: 20px">
@@ -64,20 +76,20 @@
               >
                 <Collapse>
                   <Panel name="invokeDesignSequence">
-                    <b>调用时序设计</b>
+                    <b>{{ $t("invoking_sequential_design") }}</b>
                     <Form
                       slot="content"
                       ref="invokeSequenceForm"
                       :model="invokeSequenceForm"
                       label-position="left"
-                      :label-width="120"
+                      :label-width="110"
                     >
-                      <Form-item label="调用时序设计">
+                      <Form-item :label="$t('invoking_sequential_design')">
                         <Row>
                           <Select
-                            placeholder="请选择"
+                            :placeholder="$t('select_placeholder')"
                             v-model="invokeSequenceForm.selectedInvokeSequence"
-                            style="width:calc(100% - 70px)"
+                            style="width:calc(100% - 80px)"
                           >
                             <Option
                               v-for="item in invokeSequenceForm.invokeSequenceData"
@@ -87,14 +99,14 @@
                             >
                           </Select>
                           <Button
-                            style="margin-right: 10px;float: right; width=70px;"
+                            style="float:right;width:70px;"
                             @click="onSearchInvokeSquence"
-                            >确定</Button
+                            >{{ $t("confirm") }}</Button
                           >
                         </Row>
                       </Form-item>
                       <Form-item
-                        label="调用时序设计序列"
+                        :label="$t('invoking_sequential_design_sequence')"
                         v-if="invokeSequenceForm.isShowInvokeSequenceDetial"
                       >
                         <span style="margin-right: 10px">{{
@@ -102,7 +114,7 @@
                         }}</span>
                       </Form-item>
                       <Form-Item
-                        label="当前调用"
+                        :label="$t('current_invoking')"
                         v-if="invokeSequenceForm.isShowInvokeSequenceDetial"
                       >
                         <Row>
@@ -113,7 +125,10 @@
                             class="header-buttons-container margin-right"
                             style="float:right"
                           >
-                            <Tooltip content="上一步" placement="top-start">
+                            <Tooltip
+                              :content="$t('prev_step')"
+                              placement="top-start"
+                            >
                               <Button
                                 size="small"
                                 @click="backInvokeSequence"
@@ -125,7 +140,10 @@
                                 invokeSequenceForm.totalNum
                               }}</span
                             >
-                            <Tooltip content="下一步" placement="top-start">
+                            <Tooltip
+                              :content="$t('next_step')"
+                              placement="top-start"
+                            >
                               <Button
                                 size="small"
                                 @click="nextInvokeSequence"
@@ -141,7 +159,7 @@
                         <Button
                           style="margin-right: calc(50% + 35px);width=70px;float: right"
                           @click="closeInvokeSquence"
-                          >返回</Button
+                          >{{ $t("back") }}</Button
                         >
                       </Form-Item>
                     </Form>
@@ -151,7 +169,10 @@
             </Row>
           </TabPane>
 
-          <TabPane label="物理部署图" name="physicalGraph">
+          <TabPane
+            :label="$t('physical_deployment_diagram')"
+            name="physicalGraph"
+          >
             <div id="physicalGraph">
               <PhysicalGraph
                 v-if="physicalGraphData.length"
@@ -159,13 +180,14 @@
                 :links="physicalGraphLinks"
                 :callback="graphCallback"
               ></PhysicalGraph>
+              <div v-else class="no-data">{{ $t("no_data") }}</div>
               <Spin size="large" fix v-if="physicalSpin">
                 <Icon
                   type="ios-loading"
                   size="44"
                   class="spin-icon-load"
                 ></Icon>
-                <div>加载中...</div>
+                <div>{{ $t("loading") }}</div>
               </Spin>
             </div>
           </TabPane>
@@ -176,7 +198,7 @@
             :name="ci.id"
             :label="ci.name"
           >
-            <WeTable
+            <WeCMDBTable
               :tableData="ci.tableData"
               :tableOuterActions="ci.outerActions"
               :tableInnerActions="ci.innerActions"
@@ -193,7 +215,7 @@
               @pageSizeChange="pageSizeChange"
               tableHeight="650"
               :ref="'table' + ci.id"
-            ></WeTable>
+            ></WeCMDBTable>
           </TabPane>
         </Tabs>
       </div>
@@ -233,20 +255,21 @@ import { getExtraInnerActions } from "../util/state-operations.js";
 import PhysicalGraph from "./physical-graph";
 
 const stateColorMap = new Map([
-  ["new", "#2f7344"],
-  ["created", "#2f7344"],
-  ["update", "dodgerblue"],
-  ["change", "dodgerblue"],
-  ["destroyed", "red"],
-  ["delete", "red"]
+  ["new", "#19be6b"],
+  ["created", "#19be6b"],
+  ["update", "#2d8cf0"],
+  ["change", "#2d8cf0"],
+  ["destroyed", "#ed4014"],
+  ["delete", "#ed4014"]
 ]);
 const colors = [
-  "#E1F5FE",
-  "#B3E5FC",
-  "#81D4FA",
-  "#4FC3F7",
-  "#29B6F6",
-  "#0091EA"
+  "#bbdefb",
+  "#90caf9",
+  "#64b5f6",
+  "#42a5f5",
+  "#2196f3",
+  "#1e88e5",
+  "#1976d2"
 ];
 export default {
   components: {
@@ -413,6 +436,7 @@ export default {
         this.systemDesignVersion
       );
       if (status === "OK") {
+        this.queryCiData();
         this.$Notice.success({
           title: "Success",
           desc: message
@@ -425,6 +449,8 @@ export default {
     },
     async reloadHandler() {
       this.onArchChange();
+      this.invokeSequenceForm.selectedInvokeSequence = "";
+      this.invokeSequenceForm.isShowInvokeSequenceDetial = false;
       this.isDataChanged = false;
     },
     async onArchChange() {
@@ -504,7 +530,7 @@ export default {
             title: _.data.key_name,
             id: _.guid,
             expand: true,
-            disableCheckbox: !_.data.orchestration,
+            disableCheckbox: !_.data.WeCMDBOrchestration,
             children: this.formatTree(_.children)
           };
         } else {
@@ -513,12 +539,12 @@ export default {
             title: _.data.key_name,
             id: _.guid,
             expand: true,
-            disableCheckbox: !_.data.orchestration
+            disableCheckbox: !_.data.WeCMDBOrchestration
           };
         }
       });
     },
-    initGraph(filters = {}) {
+    initGraph() {
       this.isShowInvokeSequence = true;
       this.spinShow = true;
       let graph;
@@ -558,9 +584,9 @@ export default {
         'Edge [fontname=Arial, minlen="2",fontsize=10];',
         `size="${width},${height}";`,
         `subgraph cluster_${sysData[0].guid} {`,
-        `style="filled";color="#c8d6f0";`,
+        `style="filled";color="${colors[0]}";`,
         `tooltip="${sysData[0].data.description}";`,
-        `label="${sysData[0].data.code}";`,
+        `label="${sysData[0].data.name}";`,
         this.genChildrenDot(sysData[0].children || [], 1),
         "}",
         ...this.invokeLines,
@@ -578,32 +604,41 @@ export default {
       return dots.join("");
     },
     genChildrenDot(data, level) {
+      const width = 12;
+      const height = 9;
       let dots = [];
-      data.forEach(_ => {
-        if (_.children instanceof Array && _.children.length) {
-          dots = dots.concat([
-            `subgraph cluster_${_.guid}{`,
-            `id="g_${_.guid}";`,
-            `style="filled";color="${colors[level]}";`,
-            `label="${_.data.code || _.data.key_name}";`,
-            `tooltip="${_.data.description || _.data.name}"`,
-            _.ciTypeId === 3
-              ? this.genServiceInvokeLine(_)
-              : this.genChildrenDot(_.children, level + 1),
-            "}"
-          ]);
-        } else {
-          this.physicalGraphNodes[_.guid] = _;
-          dots = dots.concat([
-            `"${_.guid}"`,
-            `[id="n_${_.guid}";`,
-            `label="${_.data.code || _.data.key_name}";`,
-            "shape=box;",
-            `style="filled";color="${colors[level]}";`,
-            `tooltip="${_.data.description || _.data.name}"];`
-          ]);
-        }
-      });
+      if (data.length) {
+        data.forEach(_ => {
+          if (_.children instanceof Array && _.children.length) {
+            dots = dots.concat([
+              `subgraph cluster_${_.guid}{`,
+              `id="g_${_.guid}";`,
+              `style="filled";color="${colors[level]}";`,
+              `label="${_.data.code || _.data.key_name}";`,
+              `tooltip="${_.data.description || _.data.name}"`,
+              _.ciTypeId === 3
+                ? this.genServiceInvokeLine(_)
+                : this.genChildrenDot(_.children, level + 1),
+              "}"
+            ]);
+          } else {
+            this.physicalGraphNodes[_.guid] = _;
+            dots = dots.concat([
+              `"${_.guid}"`,
+              `[id="n_${_.guid}";`,
+              `label="${_.data.code || _.data.key_name}";`,
+              "shape=box;",
+              `style="filled";color="${colors[level]}";`,
+              `tooltip="${_.data.description || _.data.name}"];`
+            ]);
+          }
+        });
+      } else {
+        dots.push(
+          `g[label=" ",color="${colors[0]}";width="${width}";height="${height -
+            3}"]`
+        );
+      }
       return dots.join("");
     },
     genServiceInvokeLine(unitNode) {
@@ -888,7 +923,7 @@ export default {
     },
     deleteHandler(deleteData) {
       this.$Modal.confirm({
-        title: "确认删除？",
+        title: this.$t("delete_confirm"),
         "z-index": 1000000,
         onOk: async () => {
           let found = this.tabList.find(i => i.id === this.currentTab);
@@ -1109,7 +1144,7 @@ export default {
           if (_.status !== "decommissioned" && _.status !== "notCreated") {
             const com =
               _.propertyName === "invoke_design_sequence"
-                ? { component: "sequenceDiagram" }
+                ? { component: "WeCMDBSequenceDiagram" }
                 : { ...components[_.inputType] };
             columns.push({
               ..._,
@@ -1213,5 +1248,8 @@ export default {
 #physicalGraph {
   position: relative;
   min-height: 300px;
+}
+.no-data {
+  text-align: center;
 }
 </style>

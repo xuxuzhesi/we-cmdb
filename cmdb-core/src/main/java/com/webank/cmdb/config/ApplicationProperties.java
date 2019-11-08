@@ -26,6 +26,7 @@ public class ApplicationProperties {
         private Integer ciTypeIdOfUnitDesign = 3;
         private Integer ciTypeIdOfUnit = 8;
         private Integer ciTypeIdOfSubsys = 7;
+        private String ciTypeCodeOfSubsys = "subsys";
         private Integer ciTypeIdOfHost = 12;
         private Integer ciTypeIdOfInstance = 15;
         private Integer ciTypeIdOfIdc = 16;
@@ -38,10 +39,10 @@ public class ApplicationProperties {
         private String enumCategoryCiTypeCatalog = "ci_catalog";
         private String enumCategoryCiTypeZoomLevels = "ci_zoom_level";
         private String statusAttributeName = "status";
-        private String referenceNameOfBelong = "属于";
-        private String referenceNameOfRunning = "运行在";
-        private String referenceNameOfRealize = "实现";
-        private String referenceNameOfRelate = "关联";
+        private String referenceCodeOfBelong = "belong";
+        private String referenceCodeOfRunning = "running";
+        private String referenceCodeOfRealize = "realize";
+        private String referenceCodeOfRelate = "relation";
         private String propertyNameOfState = "state";
         private String enumCodeOfStateDelete = "delete";
         private String propertyNameOfFixedDate = "fixed_date";
@@ -49,6 +50,8 @@ public class ApplicationProperties {
         private String catNameOfArchitectureDesign = "tab_of_architecture_design";
         private String catNameOfDeployDesign = "tab_of_deploy_design";
         private String catNameOfQueryDeployDesign = "tab_query_of_deploy_design";
+        private String catNameOfPlanningDesign = "tab_of_planning_design";
+        private String catNameOfResoursePlanning = "tab_of_resourse_planning";
         private String codeOfDeployDetail = "guid_of_deploy_detail";
     }
 

@@ -2,13 +2,14 @@ server:
   port: 9080
   address: localhost
   servlet:
-    context-path: /cmdb
+    context-path: /wecmdb
 
 spring:
   banner:
     location: classpath:/cmdb.txt
   profiles:
-    active: dev
+    #en-local、ch-local
+    active: en-local
   cache:
     type: caffeine
     caffeine:
@@ -47,4 +48,4 @@ logging:
     root: INFO
     com:
       webank:
-        cmdb: DEBUG
+        cmdb: INFO

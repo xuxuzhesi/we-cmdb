@@ -21,12 +21,13 @@ const width = 16;
 const height = 12;
 const fontSize = 16;
 const colors = [
-  "#c8d6f0",
-  "#cde4fd",
-  "#acc1e8",
-  "#516282",
-  "#243047",
-  "#0f1624"
+  "#bbdefb",
+  "#90caf9",
+  "#64b5f6",
+  "#42a5f5",
+  "#2196f3",
+  "#1e88e5",
+  "#1976d2"
 ];
 
 export default {
@@ -104,7 +105,7 @@ export default {
       this.translateAndScale(_this, idcData.guid, divWidth, divHeight);
     },
     genDOT(data) {
-      const label = data.data.code || data.data.key_name;
+      const label = data.data.name || data.data.code || data.data.key_name;
       const tooltip = data.data.description || data.data.code;
       let dots = [
         "digraph G{",
@@ -118,12 +119,13 @@ export default {
         this.genLink(data.guid),
         "}}"
       ];
+      // console.log(dots.join("").replace(/(;)/g, ";\n").replace(/];/g, "];\n"))
       return dots.join("");
     },
     genArea(data) {
       let result = "";
       let layers = new Map();
-      data.children instanceof Array &&
+      if (data.children instanceof Array) {
         data.children.forEach(_ => {
           const layerName = _.data.zone_layer.value;
           if (!layers.has(layerName)) {
@@ -131,25 +133,39 @@ export default {
           }
           layers.get(layerName).push(_);
         });
-      const n = layers.size;
-      const lh = (height - 3) / n;
-      layers.forEach(layer => {
-        const lw = (width - 0.5 * layer.length) / layer.length;
-        let dots = ["{rank=same;", "}"];
-        layer.forEach(_ => {
-          dots.splice(
-            -1,
-            0,
-            `g_${_.guid}`,
-            `[id="g_${_.guid}";`,
-            `label="${_.data.code || _.data.key_name}";`,
-            `tooltip="${_.data.description || data.data.code}";`,
-            `width="${lw}";`,
-            `height="${lh}"]`
-          );
+        const n = layers.size;
+        const lh = (height - 3) / n;
+        layers.forEach(layer => {
+          const lw = (width - 0.5 * layer.length) / layer.length;
+          let dots = ["{rank=same;", "}"];
+          layer.forEach(_ => {
+            dots.splice(
+              -1,
+              0,
+              `g_${_.guid}`,
+              `[id="g_${_.guid}";`,
+              `label="${_.data.code || _.data.key_name}";`,
+              `tooltip="${_.data.description || _.data.code}";`,
+              `width="${lw}";`,
+              `height="${lh}"]`
+            );
+          });
+          result += dots.join("");
         });
-        result += dots.join("");
-      });
+      } else {
+        const dots = [
+          "{rank=same;",
+          `g_${data.guid}`,
+          `[id="g_${data.guid}";`,
+          `label=" ";`,
+          `color="${colors[0]}";`,
+          `tooltip="${data.data.description || data.data.code}";`,
+          `width="${width - 0.5}";`,
+          `height="${height - 3}"]`,
+          "}"
+        ];
+        result = dots.join("");
+      }
       return result;
     },
     genLink(guid) {
@@ -165,18 +181,14 @@ export default {
             this.idcs[guid].indexOf(_.data.zone_design1.guid) >= 0 &&
             this.idcs[guid].indexOf(_.data.zone_design2.guid) >= 0
           ) {
-            result += `g_${_.data.zone_design1.guid}->g_${
-              _.data.zone_design2.guid
-            }[arrowhead=none];`;
+            result += `g_${_.data.zone_design1.guid}->g_${_.data.zone_design2.guid}[arrowhead=none];`;
           }
         } else {
           if (
             this.idcs[guid].indexOf(_.data.zone1.guid) >= 0 &&
             this.idcs[guid].indexOf(_.data.zone2.guid) >= 0
           ) {
-            result += `g_${_.data.zone1.guid}->g_${
-              _.data.zone2.guid
-            }[arrowhead=none];`;
+            result += `g_${_.data.zone1.guid}->g_${_.data.zone2.guid}[arrowhead=none];`;
           }
         }
       });
@@ -222,8 +234,10 @@ export default {
           g = graph
             .append("g")
             .attr("class", "node")
-            .attr("id", `g_${node.children[i].guid}`)
-            .attr("title", node.children[i].data.description);
+            .attr("id", `g_${node.children[i].guid}`);
+          g.append("title").text(
+            node.children[i].data.description || node.children[i].data.code
+          );
           g.append("rect")
             .attr("x", rx)
             .attr("y", ry)
@@ -284,6 +298,9 @@ export default {
             .append("g")
             .attr("class", "node")
             .attr("id", `g_${node.children[i].guid}`);
+          g.append("title").text(
+            node.children[i].data.description || node.children[i].data.code
+          );
           g.append("rect")
             .attr("x", rx)
             .attr("y", ry)
@@ -438,7 +455,7 @@ export default {
 
 <style lang="scss" scoped>
 .graph-list {
-  overflow-x: scroll;
+  overflow-x: auto;
   display: flex;
 }
 .graph-list > div {

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import axios from "axios";
-const baseURL = "/cmdb/ui/v2";
-const req = axios.create({
+export const baseURL = "/wecmdb/ui/v2";
+export const req = axios.create({
   withCredentials: true,
   baseURL,
   timeout: 50000
@@ -28,6 +28,9 @@ req.interceptors.response.use(
           desc: errorMes,
           duration: 0
         });
+      }
+      if (!res.headers["username"]) {
+        window.location.href = "/wecmdb/logout";
       }
       return {
         ...res.data,
@@ -67,7 +70,5 @@ function setHeaders(obj) {
     req.defaults.headers.common[key] = obj[key];
   });
 }
-
-export default req;
 
 export { setHeaders };

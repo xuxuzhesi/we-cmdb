@@ -1,3 +1,4 @@
+import Vue from "vue";
 export const components = {
   number: {
     component: "Input",
@@ -12,19 +13,19 @@ export const components = {
     type: "text"
   },
   select: {
-    component: "WeSelect",
+    component: "WeCMDBSelect",
     options: []
   },
   ref: {
-    component: "refSelect",
+    component: "WeCMDBRefSelect",
     highlightRow: true
   },
   multiSelect: {
-    component: "WeSelect",
+    component: "WeCMDBSelect",
     options: []
   },
   multiRef: {
-    component: "refSelect"
+    component: "WeCMDBRefSelect"
   },
   textArea: {
     component: "Input",
@@ -33,7 +34,7 @@ export const components = {
 };
 export const outerActions = [
   {
-    label: "新增",
+    label: Vue.t("new"),
     props: {
       type: "success",
       icon: "md-add",
@@ -42,7 +43,7 @@ export const outerActions = [
     actionType: "add"
   },
   {
-    label: "保存",
+    label: Vue.t("save"),
     props: {
       type: "info",
       icon: "md-checkmark",
@@ -51,7 +52,7 @@ export const outerActions = [
     actionType: "save"
   },
   {
-    label: "编辑",
+    label: Vue.t("edit"),
     props: {
       type: "info",
       icon: "ios-build",
@@ -60,7 +61,7 @@ export const outerActions = [
     actionType: "edit"
   },
   {
-    label: "删除",
+    label: Vue.t("delete"),
     props: {
       type: "error",
       icon: "ios-trash-outline",
@@ -69,7 +70,7 @@ export const outerActions = [
     actionType: "delete"
   },
   {
-    label: "取消",
+    label: Vue.t("cancel"),
     props: {
       type: "warning",
       icon: "md-undo"
@@ -78,17 +79,27 @@ export const outerActions = [
     actionType: "cancel"
   },
   {
-    label: "导出",
+    label: Vue.t("export"),
     props: {
       type: "primary",
       icon: "ios-download-outline"
     },
     actionType: "export"
+  },
+  {
+    label: Vue.t("column_filter"),
+    props: {
+      type: "primary",
+      icon: "ios-funnel",
+      shape: "circle",
+      disabled: false
+    },
+    actionType: "filterColumns"
   }
 ];
 export const innerActions = [
   {
-    label: "取消",
+    label: Vue.t("cancel"),
     props: {
       type: "warning",
       size: "small"

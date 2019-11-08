@@ -1,7 +1,15 @@
-import req from "./base";
+import { req as request, baseURL } from "./base";
+let req = request;
+if (window.request) {
+  req = {
+    post: (url, ...params) => window.request.post(baseURL + url, ...params),
+    get: (url, ...params) => window.request.get(baseURL + url, ...params),
+    delete: (url, ...params) => window.request.delete(baseURL + url, ...params),
+    put: (url, ...params) => window.request.put(baseURL + url, ...params)
+  };
+}
 
 export const getMyMenus = () => req.get("/my-menus");
-// init page
 
 // admin
 export const getAllUsers = () => req.get("/admin/users");
@@ -55,6 +63,8 @@ export const getEnumCategoriesByTypeId = catTypeId =>
   req.get(`/enum/category-types/${catTypeId}/categories`);
 
 //CI
+export const updateCIRecord = (ciTypeId, data) =>
+  req.put(`/ci-types/${ciTypeId}/ci-data/${data.guid}`, data);
 export const getRefCiTypeFrom = id => req.get(`/ci-types/${id}/references/by`);
 export const getRefCiTypeTo = id => req.get(`/ci-types/${id}/references/to`);
 export const getCiTypeAttr = id => req.get(`/ci-types/${id}/attributes`);
@@ -126,6 +136,18 @@ export const getAllZoneLinkDesignGroupByIdcDesign = () =>
 export const getAllIdcData = () => req.get(`/ci-data/all-idc`);
 export const getIdcImplementTreeByGuid = data =>
   req.post(`/data-tree/query-idc-tree`, data);
+export const getPlanningDesignTabs = () => req.get("/planning-designs/tabs");
+export const getResourcePlanningTabs = () => req.get("/resource-planning/tabs");
+export const getPlanningDesignsCiData = data =>
+  req.post(
+    `/planning-designs/ci-data?code-id=${data.id}&idcs-guid=${data.idcGuid}`,
+    data.queryObject
+  );
+export const getResourcePlanningCiData = data =>
+  req.post(
+    `/resource-planning/ci-data?code-id=${data.id}&idcs-guid=${data.idcGuid}`,
+    data.queryObject
+  );
 export const getAllZoneLinkGroupByIdc = () => req.get(`/all-zone-link`);
 export const getSystemDesigns = () => {
   return req.get(`/system-designs`);

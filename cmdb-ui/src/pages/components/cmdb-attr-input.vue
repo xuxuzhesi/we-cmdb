@@ -1,7 +1,7 @@
 <template>
   <Row>
     <Col span="19">
-      <AttrInput
+      <WeCMDBAttrInput
         v-if="mappingType === 'CMDB_CI_TYPE'"
         :allCiTypes="allCiTypes"
         :cmdbColumnSource="paramData.cmdbColumnSource"
@@ -27,17 +27,21 @@
     </Col>
     <Col span="4" offset="1">
       <Select @on-change="mappingTypeChangeHandler" v-model="mappingType">
-        <Option value="CMDB_CI_TYPE" key="CMDB_CI_TYPE">CiType属性</Option>
-        <Option value="CMDB_ENUM_CODE" key="CMDB_ENUM_CODE">枚举类型</Option>
+        <Option value="CMDB_CI_TYPE" key="CMDB_CI_TYPE">{{
+          $t("ci_type_attribute")
+        }}</Option>
+        <Option value="CMDB_ENUM_CODE" key="CMDB_ENUM_CODE">{{
+          $t("form_enum_type")
+        }}</Option>
       </Select>
     </Col>
   </Row>
 </template>
 <script>
-import AttrInput from "./attr-input";
+import WeCMDBAttrInput from "./attr-input";
 export default {
   components: {
-    AttrInput
+    WeCMDBAttrInput
   },
   data() {
     return {

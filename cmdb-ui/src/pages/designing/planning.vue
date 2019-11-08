@@ -1,13 +1,12 @@
 <template>
   <div>
     <Row class="resource-design-select-row">
-      <span>请选择IDC：</span>
+      <span>{{ $t("select_idc") }}：</span>
       <Select
-        placeholder="请选择IDC"
+        :placeholder="$t('select_idc')"
         v-model="selectedIdc"
         class="graph-select"
         @on-change="onIdcDataChange"
-        @on-open-change="getAllIdcDesignData"
       >
         <Option v-for="item in allIdcs" :value="item.guid" :key="item.guid">
           {{ item.name }}
@@ -17,7 +16,7 @@
     <Row class="resource-design-tab-row">
       <Spin fix v-if="spinShow">
         <Icon type="ios-loading" size="44" class="spin-icon-load"></Icon>
-        <div>加载中...</div>
+        <div>{{ $t("loading") }}</div>
       </Spin>
       <Tabs
         v-if="idcDesignData"
@@ -26,7 +25,7 @@
         :closable="false"
         @on-click="handleTabClick"
       >
-        <TabPane label="规划设计图" name="resource-design">
+        <TabPane :label="$t('planning_design_diagram')" name="resource-design">
           <Alert show-icon closable v-if="isDataChanged">
             Data has beed changed, click Reload button to reload graph.
             <Button slot="desc" @click="reloadHandler">Reload</Button>
@@ -39,7 +38,7 @@
           :name="ci.id"
           :label="ci.name"
         >
-          <WeTable
+          <WeCMDBTable
             :tableData="ci.tableData"
             :tableOuterActions="ci.outerActions"
             :tableInnerActions="ci.innerActions"
@@ -56,7 +55,7 @@
             @pageSizeChange="pageSizeChange"
             tableHeight="650"
             :ref="'table' + ci.id"
-          ></WeTable>
+          ></WeCMDBTable>
         </TabPane>
       </Tabs>
     </Row>
@@ -67,13 +66,13 @@
 import * as d3 from "d3-selection";
 import * as d3Graphviz from "d3-graphviz";
 import {
-  queryCiData,
+  getPlanningDesignsCiData,
   getCiTypeAttributes,
   deleteCiDatas,
   createCiDatas,
   updateCiDatas,
   getEnumCodesByCategoryId,
-  getCiTypes,
+  getPlanningDesignTabs,
   getAllIdcDesignData,
   getIdcDesignTreeByGuid,
   getAllZoneLinkDesignGroupByIdcDesign,
@@ -90,12 +89,13 @@ import { formatData } from "../util/format.js";
 import { getExtraInnerActions } from "../util/state-operations.js";
 
 const colors = [
-  "#c8d6f0",
-  "#cde4fd",
-  "#acc1e8",
-  "#516282",
-  "#243047",
-  "#0f1624"
+  "#bbdefb",
+  "#90caf9",
+  "#64b5f6",
+  "#42a5f5",
+  "#2196f3",
+  "#1e88e5",
+  "#1976d2"
 ];
 
 export default {
@@ -114,7 +114,6 @@ export default {
       },
       graph: new Map(),
       graphBig: "",
-      layerId: 5,
       idcDesignData: null,
       zoneLinkDesignData: new Map(),
       currentTab: "resource-design",
@@ -133,6 +132,7 @@ export default {
   },
   methods: {
     async onIdcDataChange(guid) {
+      this.handleTabClick(this.currentTab);
       this.spinShow = true;
       const { data, message, status } = await getIdcDesignTreeByGuid([guid]);
       if (status === "OK") {
@@ -174,9 +174,24 @@ export default {
       let dots = [
         "digraph G {",
         "rankdir=TB nodesep=0.5;",
-        'node [shape="box", fontsize=' + fsize + ', labelloc="t", penwidth=2];',
-        'size = "' + width + "," + height + '";'
+        `node [shape="box", fontsize="${fsize}", labelloc="t", penwidth="2"];`,
+        `subgraph cluster_${idcData.data.guid} {`,
+        `style="filled";color="${colors[0]}";`,
+        `label="${idcData.data.name ||
+          idcData.data.description ||
+          idcData.data.code}";`,
+        `size="${width},${height}";`,
+        this.genChildren(idcData),
+        this.genLink(links),
+        "}}"
       ];
+      return dots.join("");
+    },
+    genChildren(idcData) {
+      const width = 16;
+      const height = 12;
+      let dots = [];
+      const children = idcData.children || [];
       let layers = new Map();
       children.forEach(zone => {
         if (layers.has(zone.data.zone_layer.value)) {
@@ -187,42 +202,46 @@ export default {
           layers.set(zone.data.zone_layer.value, layer);
         }
       });
-      layers.forEach(layer => {
-        dots.push('{rank = "same";');
-        let n = layers.size;
-        let lg = (height - 3) / n;
-        let ll = (width - 0.5 * layer.length) / layer.length;
-        layer.forEach(zone => {
-          let label;
-          if (
-            zone.data.code &&
-            zone.data.code !== null &&
-            zone.data.code !== ""
-          ) {
-            label = zone.data.code;
-          } else {
-            label = zone.data.key_name;
-          }
-          dots.push(
-            `g_${zone.guid}` +
-              '[id="g_' +
-              zone.guid +
-              '", label="' +
-              label +
-              '", width=' +
-              ll +
-              ",height=" +
-              lg +
-              "];"
-          );
+      if (layers.size) {
+        layers.forEach(layer => {
+          dots.push('{rank = "same";');
+          let n = layers.size;
+          let lg = (height - 3) / n;
+          let ll = (width - 0.5 * layer.length) / layer.length;
+          layer.forEach(zone => {
+            let label;
+            if (
+              zone.data.code &&
+              zone.data.code !== null &&
+              zone.data.code !== ""
+            ) {
+              label = zone.data.code;
+            } else {
+              label = zone.data.key_name;
+            }
+            dots.push(
+              `g_${zone.guid}[id="g_${
+                zone.guid
+              }", label="${label}", width=${ll},height=${lg}];`
+            );
+          });
+          dots.push("}");
         });
-        dots.push("}");
-      });
-      links.forEach(link => {
-        dots.push(link.azone + "->" + link.bzone + '[arrowhead="none"];');
-      });
-      dots.push("}");
+      } else {
+        dots.push(
+          `g_${idcData.data.guid}[label=" ";color="${
+            colors[0]
+          }";width="${width - 0.5}";height="${height - 3}"]`
+        );
+      }
       return dots.join("");
+    },
+    genLink(links) {
+      let result = "";
+      links.forEach(link => {
+        result += `${link.azone}->${link.bzone}[arrowhead="none"];`;
+      });
+      return result;
     },
     renderGraph(idcData) {
       let nodesString = this.genDOT(
@@ -525,7 +544,7 @@ export default {
     },
     deleteHandler(deleteData) {
       this.$Modal.confirm({
-        title: "确认删除？",
+        title: this.$t("delete_confirm"),
         "z-index": 1000000,
         onOk: async () => {
           const payload = {
@@ -658,9 +677,11 @@ export default {
       }
     },
     async exportHandler() {
-      const { status, message, data } = await queryCiData({
-        id: this.currentTab,
-        queryObject: {}
+      const found = this.tabList.find(_ => _.code === this.currentTab);
+      const { status, message, data } = await getPlanningDesignsCiData({
+        idcGuid: this.selectedIdc,
+        id: found.codeId,
+        queryObject: this.payload
       });
       if (status === "OK") {
         this.$refs[this.tableRef][0].export({
@@ -686,6 +707,7 @@ export default {
       this.queryCiData();
     },
     async queryCiData() {
+      this.getAllIdcDesignData();
       this.payload.pageable.pageSize = 10;
       this.payload.pageable.startIndex = 0;
       this.tabList.forEach(ci => {
@@ -695,11 +717,12 @@ export default {
             (ci.pagination.currentPage - 1) * ci.pagination.pageSize;
         }
       });
-      const query = {
-        id: this.currentTab,
+      const found = this.tabList.find(_ => _.code === this.currentTab);
+      const { status, message, data } = await getPlanningDesignsCiData({
+        idcGuid: this.selectedIdc,
+        id: found.codeId,
         queryObject: this.payload
-      };
-      const { status, message, data } = await queryCiData(query);
+      });
       if (status === "OK") {
         this.tabList.forEach(ci => {
           if (ci.id === this.currentTab) {
@@ -808,52 +831,38 @@ export default {
       }
       this.initGraph();
     },
-    async getAllCiTypeByLayer(layerId) {
-      if (layerId < 0) {
-        return;
-      }
-      let filter = {
-        key: "group-by",
-        value: "layer"
-      };
-      const { status, message, data } = await getCiTypes(filter);
+    async getTabLists() {
+      const { status, message, data } = await getPlanningDesignTabs();
       if (status === "OK") {
         let allInnerActions = await getExtraInnerActions();
-        data.forEach(item => {
-          if (item.codeId === layerId) {
-            this.tabList = item.ciTypes.map(_ => {
-              if (_.status === "created" || _.status === "dirty") {
-                return {
-                  ..._,
-                  name: _.name,
-                  id: _.ciTypeId + "",
-                  tableData: [],
-                  tableColumns: [],
-                  outerActions: JSON.parse(JSON.stringify(outerActions)),
-                  innerActions: JSON.parse(
-                    JSON.stringify(innerActions.concat(allInnerActions))
-                  ),
-                  pagination: JSON.parse(JSON.stringify(pagination)),
-                  ascOptions: {}
-                };
-              }
-            });
-            this.tabList = this.tabList.filter(tab => tab);
-          }
+        this.tabList = data.map(_ => {
+          return {
+            ..._,
+            name: _.value,
+            id: _.code,
+            tableData: [],
+            tableColumns: [],
+            outerActions: JSON.parse(JSON.stringify(outerActions)),
+            innerActions: JSON.parse(
+              JSON.stringify(innerActions.concat(allInnerActions))
+            ),
+            pagination: JSON.parse(JSON.stringify(pagination)),
+            ascOptions: {}
+          };
         });
+        this.tabList = this.tabList.filter(tab => tab);
       }
     },
-    async getAllIdcDesignData(status) {
-      if (status) {
-        const { status, message, data } = await getAllIdcDesignData();
-        if (status === "OK") {
-          this.allIdcs = data.map(_ => _.data);
-        }
+    async getAllIdcDesignData() {
+      const { status, message, data } = await getAllIdcDesignData();
+      if (status === "OK") {
+        this.allIdcs = data.map(_ => _.data);
       }
     }
   },
-  created() {
-    this.getAllCiTypeByLayer(this.layerId);
+  mounted() {
+    this.getTabLists();
+    this.getAllIdcDesignData();
   }
 };
 </script>

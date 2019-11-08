@@ -1,14 +1,9 @@
 <template>
   <div>
     <Row>
-      <Col span="6">
-        <span style="margin-right: 10px">根CI类型</span>
-        <Select
-          v-model="selectedCI"
-          filterable
-          style="width: 75%;"
-          @on-change="onCITypeChange"
-        >
+      <Col span="7" class="header">
+        <span>{{ $t("root_ci_type") }}</span>
+        <Select v-model="selectedCI" filterable @on-change="onCITypeChange">
           <Option
             v-for="item in allCiTypes"
             :value="item.ciTypeId"
@@ -17,12 +12,11 @@
           >
         </Select>
       </Col>
-      <Col span="17" offset="1">
-        <span style="margin-right: 10px">综合查询名称</span>
+      <Col span="16" offset="1" class="header">
+        <span>{{ $t("integrated_query_name") }}</span>
         <Select
           v-model="selectedQueryName"
           filterable
-          style="width: 75%;"
           :disabled="!selectedCI"
           @on-change="onQueryNameSelectChange"
         >
@@ -36,13 +30,14 @@
       </Col>
     </Row>
     <Row v-if="!!selectedQueryName" style="margin-top: 20px;">
-      <WeTable
+      <WeCMDBTable
         :tableData="tableData"
         :tableOuterActions="outerActions"
         :tableInnerActions="innerActions"
         :tableColumns="tableColumns"
         :pagination="pagination"
         :showCheckbox="false"
+        :isColumnsFilterOn="false"
         @actionFun="actionFun"
         @pageChange="pageChange"
         @pageSizeChange="pageSizeChange"
@@ -50,21 +45,21 @@
         @handleSubmit="handleSubmit"
         tableHeight="650"
         ref="table"
-      ></WeTable>
+      ></WeCMDBTable>
 
-      <Modal v-model="originDataModal" title="原始数据" footer-hide>
+      <Modal v-model="originDataModal" :title="$t('basic_data')" footer-hide>
         <highlight-code lang="json">{{ showRowOriginData }}</highlight-code>
       </Modal>
 
       <Modal
         v-model="filtersAndResultModal"
-        title="报文"
+        :title="$t('message')"
         footer-hide
         width="75"
       >
         <div style="max-height: 600px; overflow: auto;">
           <Row
-            >请求URL:
+            >{{ $t("request_url") }}
             <highlight-code lang="json">{{ requestURL }}</highlight-code>
           </Row>
           <Row>
@@ -84,6 +79,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import {
   getAllCITypes,
   getQueryNames,
@@ -94,7 +90,7 @@ import {
 import { components } from "../../const/actions.js";
 const innerActions = [
   {
-    label: "原始数据",
+    label: Vue.t("basic_data"),
     props: {
       type: "info",
       size: "small"
@@ -104,7 +100,7 @@ const innerActions = [
 ];
 const outerActions = [
   {
-    label: "显示报文",
+    label: Vue.t("show_message"),
     props: {
       type: "success",
       icon: "ios-eye",
@@ -173,7 +169,7 @@ export default {
     onQueryNameSelectChange(value) {
       if (value) {
         this.getTableHeader(value);
-        this.requestURL = `/cmdb/intQuery/${value}/execute`;
+        this.requestURL = `/wecmdb/intQuery/${value}/execute`;
       }
     },
     async getTableHeader(id) {
@@ -288,4 +284,17 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.header {
+  display: flex;
+  justify-content: center;
+  > span {
+    height: 32px;
+    line-height: 32px;
+    margin-right: 10px;
+  }
+  > div {
+    flex: 1;
+  }
+}
+</style>
